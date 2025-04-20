@@ -19,6 +19,19 @@ export default defineConfig({
         v3_lazyRouteDiscovery: true,
       },
     }),
-    tsconfigPaths(),
+    tsconfigPaths(),	
   ],
+  ssr: {
+	noExternal: [
+	/@syncfusion/, 
+      "@mui/material",
+      "@mui/icons-material",
+      "ra-core",
+      "ra-data-simple-rest", // Se você está usando esse provider
+      "ra-data-json-server", // Para JSON Server
+      "react-admin", // Pacote principal do React-admin
+	  "ej2-react-buttons",
+	]
+	},
 });
+

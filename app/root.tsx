@@ -4,6 +4,7 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  LiveReload
 } from "@remix-run/react";
 import type { LinksFunction } from "@remix-run/node";
 
@@ -22,24 +23,23 @@ export const links: LinksFunction = () => [
   },
 ];
 
-export function Layout({ children }: { children: React.ReactNode }) {
+export default function App() {
   return (
-    <html lang="en">
+    <html lang="pt-BR" className="bg-gray-900 text-white">
       <head>
-        <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
         <Meta />
         <Links />
       </head>
-      <body>
-        {children}
+      <body className="min-h-screen font-sans">
+        <header className="p-4 bg-gray-800 border-b border-gray-700">
+          <h1 className="text-2xl font-bold">Agente de IA Interativo 🎤</h1>
+        </header>
+        <main className="p-4 max-w-4xl mx-auto">
+          <Outlet />
+        </main>
         <ScrollRestoration />
-        <Scripts />
+        <Scripts />        
       </body>
     </html>
   );
-}
-
-export default function App() {
-  return <Outlet />;
 }

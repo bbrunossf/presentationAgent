@@ -1,0 +1,11 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: pythonbackend
+    ports:
+      - "8000:8000"
+    environment:
+      - OPENAI_API_KEY=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
+      
