@@ -25,14 +25,14 @@ export const links: LinksFunction = () => [
 
 export default function App() {
   return (
-    <html lang="pt-BR" className="bg-gray-900 text-white">
+    <html lang="pt-BR" className="bg-gray-900 text-black">
       <head>
         <Meta />
         <Links />
       </head>
       <body className="min-h-screen font-sans">
         <header className="p-4 bg-gray-800 border-b border-gray-700">
-          <h1 className="text-2xl font-bold">Agente de IA Interativo 🎤</h1>
+          <h1 className="text-2xl font-bold text-white">Agente de IA Interativo 🎤</h1>
         </header>
         <main className="p-4 max-w-4xl mx-auto">
           <Outlet />

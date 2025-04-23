@@ -24,8 +24,8 @@ export default function CommandInput() {
         return;
       }
   
-      const { content } = await res.json();
-      setResponse({ input: command, output: content });
+      const {  content } = await res.json();
+      setResponse({ input: command, output:  content });
     } catch (err: any) {
       console.error("Erro na requisição ao agente:", err);
       setResponse({ input: command, output: "Erro ao conectar com o agente." });
@@ -35,7 +35,7 @@ export default function CommandInput() {
 
   return (
     <div className="bg-black p-4 shadow rounded">
-      <h2 className="text-lg font-semibold mb-2">Comando do Agente</h2>
+      <h2 className="text-lg font-semibold text-red-700 mb-2">Comando do Agente</h2>
       <textarea
         className="w-full p-2 border rounded resize-none bg-gray-800 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
         rows={5}

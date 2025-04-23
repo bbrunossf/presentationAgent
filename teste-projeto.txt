@@ -1,0 +1,932 @@
+Token Usage:
+GitHub Tokens: 6583
+LLM Input Tokens: 0
+LLM Output Tokens: 0
+Total Tokens: 6583
+
+FileTree:
+.gitignore
+README.md
+app/backend/agent/main.py
+app/backend/agent/requirements.txt
+app/backend/agent/whisper_handler.py
+app/backend/docker-compose.yml
+app/components/Canvas.tsx
+app/components/CommandInput.tsx
+app/components/Header.tsx
+app/components/Layout.tsx
+app/components/OutputDisplay.tsx
+app/components/Sidebar.tsx
+app/components/VoiceInput.tsx
+app/components/WorkloadChart.tsx
+app/data/routes.json
+app/entry.client.tsx
+app/entry.server.tsx
+app/root.tsx
+app/routes/_index.tsx
+app/routes/api.run-agent.ts
+app/routes/api.transcribe.ts
+app/services/remoteAgent.ts
+app/store/useCommandStore.ts
+app/tailwind.css
+app/utils/generateRoute.ts
+app/utils/writeRouteToFile.ts
+package.json
+postcss.config.js
+remix.config.js
+remix.env.d.ts
+tailwind.config.ts
+tsconfig.json
+vite.config.ts
+
+Analysis:
+.gitignore
+
+node_modules
+
+/.cache
+/build
+.env
+README.md
+
+Projeto Agente PPT
+Objetivo
+O objetivo desse projeto é criar uma interface onde seja possível passar informações para um agente de IA, e exibir os resultados na mesma página, em uma seção exclusiva.
+O projeto vai utilizar o framework Remix, e todas as bibliotecas usadas serão registradas nesse arquivo.
+
+Declaração de Escopo do Projeto
+Interface Intuitiva: Crie uma página com uma interface amigável onde você possa interagir com o agente. Inclua um campo de entrada para comandos ou perguntas.
+
+Canvas ou Painel de Resultados: Dedique uma seção da página para exibir os resultados das tarefas executadas. Pode ser um canvas para visualizações gráficas ou um painel para texto e gráficos.
+
+Comunicação com a API: Configure a comunicação entre sua aplicação e a API do agente de IA para enviar comandos e receber resultados.
+
+Demonstração ao Vivo: Durante a palestra, execute comandos ao vivo e mostre como o agente processa as tarefas, exibindo os resultados no painel em tempo real.
+
+Etapas de desenvolvimento
+API para Modificação de Rotas: Crie uma API no Remix que permita modificar ou salvar informações relacionadas às rotas. Por exemplo, um endpoint POST que recebe dados para atualizar uma rota específica.
+
+Detecção de Mudança: Implemente um sistema de detecção de mudanças no lado do servidor, que atualize a interface do usuário quando uma rota for modificada.
+
+Re-renderização Automática: Utilize a funcionalidade de revalidação ou re-renderização automática do Remix para refletir as mudanças na interface do usuário assim que a rota for atualizada.
+
+Feedback Visual: Garanta que o painel ou canvas na página mostre claramente as mudanças em tempo real, proporcionando um feedback visual instantâneo.
+
+Estrutura inicial do Projeto
+Relação de pastas e arquivos necessários
+/app
+├── /routes
+│ ├── index.tsx # Rota principal que renderiza a interface geral
+│ ├── /generated # Pasta para armazenar as rotas geradas dinamicamente
+│ │ └── newRoute.tsx # Exemplo de uma rota gerada dinamicamente
+├── /components
+│ ├── Layout.tsx # Layout principal da aplicação
+│ ├── Sidebar.tsx # Componente para a navegação lateral
+│ ├── WorkloadChart.tsx # Componente para renderizar o gráfico de carga de trabalho
+├── /utils
+│ ├── generateRoute.ts # Função para gerar código de novas rotas
+│ └── writeRouteToFile.ts # Função para escrever o código gerado no arquivo da rota
+├── /services
+│ └── agent.ts # Agente de IA que gera o código das rotas
+├── /styles
+│ └── global.css # Estilos globais
+├── /data
+│ └── routes.json # Arquivo JSON que mantém o histórico das rotas geradas
+└── /config
+└── remix.config.js # Arquivo de configuração do Remix
+
+app/backend/agent/main.py
+
+from fastapi import FastAPI, UploadFile, File
+from whisper_handler import transcribe_audio
+from openai import OpenAI
+import os
+
+app = FastAPI()
+client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
+
+@app.post("/transcribe")
+async def transcribe(file: UploadFile = File(...)):
+    transcript = await transcribe_audio(file)
+    #return {"text": transcript}
+    print("Transcrição gerada:", transcript)
+    return {"text": transcript}
+
+@app.post("/agent")
+async def agent(input: dict):
+    prompt = input["prompt"]
+    response = client.chat.completions.create(
+        model="gpt-4o",
+        messages=[{"role": "user", "content": prompt}]
+    )
+    #return {"response": response.choices[0].message.content}
+    return {
+        "type": "text",
+        "prompt": prompt,
+        "response": response.choices[0].message.content
+        }
+app/backend/agent/requirements.txt
+
+fastapi
+uvicorn
+openai>=1.0.0
+python-multipart
+app/backend/agent/whisper_handler.py
+
+import tempfile
+from openai import OpenAI
+import os
+
+client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
+
+async def transcribe_audio(file):
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as tmp:
+        content = await file.read()
+        tmp.write(content)
+        tmp_path = tmp.name
+
+    with open(tmp_path, "rb") as audio_file:
+        transcript = client.audio.transcriptions.create(
+            model="gpt-4o-transcribe",
+            file=audio_file,
+            response_format="text"
+        )
+    return transcript
+app/backend/docker-compose.yml
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: pythonbackend
+    ports:
+      - "8000:8000"
+    environment:
+      
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+app/components/Canvas.tsx
+
+import { Outlet } from "@remix-run/react";
+
+export default function Canvas() {
+  return (
+    <div className="bg-white p-4 shadow rounded min-h-[300px] mt-4">
+      <h2 className="text-lg font-semibold mb-2">Canvas</h2>
+      <div className="canvas-content">
+        <Outlet />
+      </div>
+    </div>
+  );
+}
+app/components/CommandInput.tsx
+
+// app/components/CommandInput.tsx
+import { useState } from "react";
+import VoiceInput from "./VoiceInput";
+import { useCommandStore } from "~/store/useCommandStore";
+
+export default function CommandInput() {
+  const setResponse = useCommandStore((state) => state.setResponse);
+  const [command, setCommand] = useState("");
+
+  const handleSubmit = async () => {
+    if (!command.trim()) return;
+  
+    try {
+      const res = await fetch("/api/run-agent", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt: command }),
+      });
+  
+      if (!res.ok) {
+        const msg = await res.text();
+        console.error("Erro na resposta do agente:", msg);
+        setResponse({ input: command, output: `Erro: ${msg}` });
+        return;
+      }
+  
+      const { content } = await res.json();
+      setResponse({ input: command, output: content });
+    } catch (err: any) {
+      console.error("Erro na requisição ao agente:", err);
+      setResponse({ input: command, output: "Erro ao conectar com o agente." });
+    }
+  };
+  
+
+  return (
+    <div className="bg-black p-4 shadow rounded">
+      <h2 className="text-lg font-semibold mb-2">Comando do Agente</h2>
+      <textarea
+        className="w-full p-2 border rounded resize-none bg-gray-800 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        rows={5}
+        value={command}
+        onChange={(e) => setCommand(e.target.value)}
+        placeholder="Digite ou fale seu comando..."
+      />
+      <div className="flex items-center gap-2 mt-2">
+        <button
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          onClick={handleSubmit}
+        >
+          Executar
+        </button>
+        <VoiceInput />
+      </div>
+    </div>
+  );
+}
+app/components/Header.tsx
+
+// app/components/Header.tsx
+export default function Header() {
+    return (
+      <header className="bg-white shadow p-4">
+        <h1 className="text-xl font-bold text-gray-800">
+          🔧 Gerador de Rotas Inteligente
+        </h1>
+      </header>
+    );
+  }
+  
+app/components/Layout.tsx
+
+// app/components/Layout.tsx
+import { useCommandStore } from "~/store/useCommandStore";
+import Header from "./Header";
+import CommandInput from "./CommandInput";
+import OutputDisplay from "./OutputDisplay";
+import Canvas from "./Canvas";
+
+export default function Layout() {
+    const inputText = useCommandStore((state) => state.inputText);
+    const outputText = useCommandStore((state) => state.outputText);
+
+  return (
+    <div className="min-h-screen flex flex-col bg-gray-50">
+      <Header />
+      <main className="flex-1 flex flex-col md:flex-row p-4 gap-4">
+        <section className="w-full md:w-1/2">
+          {/* <CommandInput
+            onResponse={({ input, output }) => {
+              setTranscription(input);
+              setResponse(output);
+            }}
+          /> */}
+          <CommandInput />
+        </section>
+        <section className="w-full md:w-1/2">
+          {/* <OutputDisplay text={transcription || "Aguardando transcrição..."} />
+          <OutputDisplay text={response || "Aguardando resposta do agente..."} /> */}
+          <OutputDisplay text={inputText || "Aguardando entrada..."} />
+          <OutputDisplay text={outputText || "Aguardando resposta do agente..."} />
+          {/* Canvas for nested AI agent output routes */}
+          <Canvas />
+        </section>
+      </main>
+    </div>
+  );
+}
+app/components/OutputDisplay.tsx
+
+// app/components/OutputDisplay.tsx
+export default function OutputDisplay({ text }: { text: string }) {
+  return (
+    <div className="bg-white p-4 shadow rounded min-h-[150px]">
+      <h2 className="text-lg font-semibold mb-2">Resultado</h2>
+      <pre className="whitespace-pre-wrap text-sm text-gray-700">{text}</pre>
+    </div>
+  );
+}
+app/components/Sidebar.tsx
+
+
+app/components/VoiceInput.tsx
+
+import { useState, useRef } from "react";
+
+import { useCommandStore } from "~/store/useCommandStore";
+
+export default function VoiceInput() {
+  const setResponse = useCommandStore((state) => state.setResponse);
+  const [recording, setRecording] = useState(false);
+  const [processing, setProcessing] = useState(false);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunks = useRef<Blob[]>([]);
+
+  const startRecording = async () => {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const mediaRecorder = new MediaRecorder(stream);
+    mediaRecorderRef.current = mediaRecorder;
+
+    audioChunks.current = [];
+
+    mediaRecorder.ondataavailable = (e) => {
+      if (e.data.size > 0) {
+        audioChunks.current.push(e.data);
+      }
+    };
+
+    mediaRecorder.onstop = async () => {
+      setProcessing(true);
+      const audioBlob = new Blob(audioChunks.current, { type: "audio/mp3" });
+      const formData = new FormData();
+      formData.append("audio", audioBlob, "recording.mp3");
+
+      try {
+        const transcribeRes = await fetch("/api/transcribe", {
+          method: "POST",
+          body: formData,
+        });
+        const { text } = await transcribeRes.json();
+        console.log("Transcrição:", text);
+
+        const agentRes = await fetch("/api/run-agent", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ prompt: text }),
+        });
+        const { content } = await agentRes.json();
+        setResponse({ input: text, output: content });
+        //onResponse({ input: text, output: "(agent ainda não implementado)" });
+      } catch (err) {
+        console.error("Erro durante transcrição ou resposta:", err);
+      } finally {
+        setProcessing(false);
+      }
+    };
+
+    mediaRecorder.start();
+    setRecording(true);
+  };
+
+  const stopRecording = () => {
+    mediaRecorderRef.current?.stop();
+    setRecording(false);
+  };
+
+  return (
+    <div className="flex items-center gap-4">
+      <button
+        onClick={recording ? stopRecording : startRecording}
+        className={`px-4 py-2 text-white font-semibold rounded ${
+          recording ? "bg-red-600" : "bg-green-600"
+        }`}
+      >
+        {recording ? "Parar" : "Falar"}
+      </button>
+
+      {recording && <MicrophoneVisualizer />}
+      {processing && <p className="text-sm text-yellow-500">Processando...</p>}
+    </div>
+  );
+}
+
+// Animação simples de microfone ativo
+function MicrophoneVisualizer() {
+  return (
+    <div className="flex gap-1 items-end h-6 ml-4">
+      {[...Array(5)].map((_, i) => (
+        <div
+          key={i}
+          className="w-1 bg-white animate-pulse"
+          style={{
+            height: `${Math.random() * 24 + 8}px`,
+            animationDelay: `${i * 0.1}s`,
+            animationDuration: "0.6s",
+            animationIterationCount: "infinite",
+            animationTimingFunction: "ease-in-out",
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+app/components/WorkloadChart.tsx
+
+
+app/data/routes.json
+
+
+app/entry.client.tsx
+
+/**
+ * By default, Remix will handle hydrating your app on the client for you.
+ * You are free to delete this file if you'd like to, but if you ever want it revealed again, you can run `npx remix reveal` ✨
+ * For more information, see https://remix.run/file-conventions/entry.client
+ */
+
+import { RemixBrowser } from "@remix-run/react";
+import { startTransition, StrictMode } from "react";
+import { hydrateRoot } from "react-dom/client";
+
+startTransition(() => {
+  hydrateRoot(
+    document,
+    <StrictMode>
+      <RemixBrowser />
+    </StrictMode>
+  );
+});
+app/entry.server.tsx
+
+/**
+ * By default, Remix will handle generating the HTTP Response for you.
+ * You are free to delete this file if you'd like to, but if you ever want it revealed again, you can run `npx remix reveal` ✨
+ * For more information, see https://remix.run/file-conventions/entry.server
+ */
+
+import { PassThrough } from "node:stream";
+
+import type { AppLoadContext, EntryContext } from "@remix-run/node";
+import { createReadableStreamFromReadable } from "@remix-run/node";
+import { RemixServer } from "@remix-run/react";
+import { isbot } from "isbot";
+import { renderToPipeableStream } from "react-dom/server";
+
+const ABORT_DELAY = 5_000;
+
+export default function handleRequest(
+  request: Request,
+  responseStatusCode: number,
+  responseHeaders: Headers,
+  remixContext: EntryContext,
+  // This is ignored so we can keep it in the template for visibility.  Feel
+  // free to delete this parameter in your app if you're not using it!
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  loadContext: AppLoadContext
+) {
+  return isbot(request.headers.get("user-agent") || "")
+    ? handleBotRequest(
+        request,
+        responseStatusCode,
+        responseHeaders,
+        remixContext
+      )
+    : handleBrowserRequest(
+        request,
+        responseStatusCode,
+        responseHeaders,
+        remixContext
+      );
+}
+
+function handleBotRequest(
+  request: Request,
+  responseStatusCode: number,
+  responseHeaders: Headers,
+  remixContext: EntryContext
+) {
+  return new Promise((resolve, reject) => {
+    let shellRendered = false;
+    const { pipe, abort } = renderToPipeableStream(
+      <RemixServer
+        context={remixContext}
+        url={request.url}
+        abortDelay={ABORT_DELAY}
+      />,
+      {
+        onAllReady() {
+          shellRendered = true;
+          const body = new PassThrough();
+          const stream = createReadableStreamFromReadable(body);
+
+          responseHeaders.set("Content-Type", "text/html");
+
+          resolve(
+            new Response(stream, {
+              headers: responseHeaders,
+              status: responseStatusCode,
+            })
+          );
+
+          pipe(body);
+        },
+        onShellError(error: unknown) {
+          reject(error);
+        },
+        onError(error: unknown) {
+          responseStatusCode = 500;
+          // Log streaming rendering errors from inside the shell.  Don't log
+          // errors encountered during initial shell rendering since they'll
+          // reject and get logged in handleDocumentRequest.
+          if (shellRendered) {
+            console.error(error);
+          }
+        },
+      }
+    );
+
+    setTimeout(abort, ABORT_DELAY);
+  });
+}
+
+function handleBrowserRequest(
+  request: Request,
+  responseStatusCode: number,
+  responseHeaders: Headers,
+  remixContext: EntryContext
+) {
+  return new Promise((resolve, reject) => {
+    let shellRendered = false;
+    const { pipe, abort } = renderToPipeableStream(
+      <RemixServer
+        context={remixContext}
+        url={request.url}
+        abortDelay={ABORT_DELAY}
+      />,
+      {
+        onShellReady() {
+          shellRendered = true;
+          const body = new PassThrough();
+          const stream = createReadableStreamFromReadable(body);
+
+          responseHeaders.set("Content-Type", "text/html");
+
+          resolve(
+            new Response(stream, {
+              headers: responseHeaders,
+              status: responseStatusCode,
+            })
+          );
+
+          pipe(body);
+        },
+        onShellError(error: unknown) {
+          reject(error);
+        },
+        onError(error: unknown) {
+          responseStatusCode = 500;
+          // Log streaming rendering errors from inside the shell.  Don't log
+          // errors encountered during initial shell rendering since they'll
+          // reject and get logged in handleDocumentRequest.
+          if (shellRendered) {
+            console.error(error);
+          }
+        },
+      }
+    );
+
+    setTimeout(abort, ABORT_DELAY);
+  });
+}
+app/root.tsx
+
+import {
+  Links,
+  Meta,
+  Outlet,
+  Scripts,
+  ScrollRestoration,
+  LiveReload
+} from "@remix-run/react";
+import type { LinksFunction } from "@remix-run/node";
+
+import "./tailwind.css";
+
+export const links: LinksFunction = () => [
+  { rel: "preconnect", href: "https://fonts.googleapis.com" },
+  {
+    rel: "preconnect",
+    href: "https://fonts.gstatic.com",
+    crossOrigin: "anonymous",
+  },
+  {
+    rel: "stylesheet",
+    href: "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap",
+  },
+];
+
+export default function App() {
+  return (
+    <html lang="pt-BR" className="bg-gray-900 text-white">
+      <head>
+        <Meta />
+        <Links />
+      </head>
+      <body className="min-h-screen font-sans">
+        <header className="p-4 bg-gray-800 border-b border-gray-700">
+          <h1 className="text-2xl font-bold">Agente de IA Interativo 🎤</h1>
+        </header>
+        <main className="p-4 max-w-4xl mx-auto">
+          <Outlet />
+        </main>
+        <ScrollRestoration />
+        <Scripts />        
+      </body>
+    </html>
+  );
+}
+app/routes/_index.tsx
+
+// app/routes/index.tsx
+import Layout from "~/components/Layout";
+
+export default function Index() {
+  return <Layout />;
+}
+app/routes/api.run-agent.ts
+
+// app/routes/api/run-agent.ts
+import { json } from "@remix-run/node";
+import type { ActionFunction } from "@remix-run/node";
+import { runAgent } from "~/services/remoteAgent";
+
+export const action: ActionFunction = async ({ request }) => {
+  const { prompt } = await request.json();
+
+  const result = await runAgent(prompt);
+
+  return json(result);
+};
+app/routes/api.transcribe.ts
+
+// app/routes/api/transcribe.ts
+import type { ActionFunction } from "@remix-run/node";
+import { json } from "@remix-run/node";
+import { unstable_parseMultipartFormData, unstable_createFileUploadHandler } from "@remix-run/node";
+
+export const action: ActionFunction = async ({ request }) => {
+  const uploadHandler = unstable_createFileUploadHandler({
+    directory: "/tmp",
+    maxPartSize: 10_000_000,
+  });
+
+  const formData = await unstable_parseMultipartFormData(request, uploadHandler);
+  const file = formData.get("audio") as File;
+
+  console.log("Arquivo recebido:", file.name, file.type, file.size);
+
+  const response = await fetch("http://localhost:8000/transcribe", {
+    method: "POST",
+    body: (() => {
+      const fd = new FormData();
+      fd.append("file", file);
+      return fd;
+    })(),
+  });
+
+  const data = await response.json();
+  return json(data);
+};
+app/services/remoteAgent.ts
+
+// app/services/agent.ts
+type AgentResponse = {
+    type: "text" | "code" | "json" | "error";
+    content: string;
+  };
+  
+  export async function runAgent(prompt: string): Promise<AgentResponse> {
+    try {
+      const response = await fetch("http://localhost:8000/agent", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ prompt }),
+      });
+  
+      if (!response.ok) {
+        const errorText = await response.text();
+        return { type: "error", content: `Erro do agente: ${errorText}` };
+      }
+  
+      const { response: content } = await response.json();
+      return {
+        type: "text", // você pode usar um analisador depois para definir tipo
+        content,
+      };
+    } catch (error: any) {
+      return {
+        type: "error",
+        content: `Erro ao executar agente: ${error.message}`,
+      };
+    }
+  }
+  
+app/store/useCommandStore.ts
+
+import {create} from 'zustand';
+
+interface CommandStore {
+  inputText: string;
+  outputText: string;
+  setInputText: (input: string) => void;
+  setOutputText: (output: string) => void;
+  setResponse: (args: { input: string; output: string }) => void;
+}
+
+export const useCommandStore = create<CommandStore>((set) => ({
+  inputText: '',
+  outputText: '',
+  setInputText: (input) => set({ inputText: input }),
+  setOutputText: (output) => set({ outputText: output }),
+  setResponse: ({ input, output }) => set({ inputText: input, outputText: output }),
+}));
+app/tailwind.css
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body {
+  @apply bg-slate-300 dark:bg-gray-950;
+
+  @media (prefers-color-scheme: dark) {
+    color-scheme: dark;
+  }
+}
+app/utils/generateRoute.ts
+
+export function generateRoute(routeName: string): string {
+  return `
+    import { json, LoaderFunction } from 'remix';
+    
+    export let loader: LoaderFunction = async () => {
+      return json({ message: "Este é o conteúdo da rota ${routeName}" });
+    };
+
+    export default function ${routeName}() {
+      return <div><h1>${routeName}</h1></div>;
+    }
+  `;
+}
+app/utils/writeRouteToFile.ts
+
+import { writeFile } from 'fs';
+import { generateRoute } from './generateRoute';
+
+export function writeRouteToFile(routeName: string) {
+  const routeCode = generateRoute(routeName);
+  const filePath = `./app/routes/generated/${routeName}.tsx`;
+
+  writeFile(filePath, routeCode, (err) => {
+    if (err) throw err;
+    console.log(`Rota ${routeName} gerada com sucesso!`);
+  });
+}
+package.json
+
+{
+  "name": "",
+  "private": true,
+  "sideEffects": false,
+  "type": "module",
+  "scripts": {
+    "build": "remix vite:build",
+    "dev": "remix vite:dev",
+    "lint": "eslint --ignore-path .gitignore --cache --cache-location ./node_modules/.cache/eslint .",
+    "start": "remix-serve ./build/server/index.js",
+    "typecheck": "tsc"
+  },
+  "dependencies": {
+    "@remix-run/node": "^2.16.5",
+    "@remix-run/react": "^2.16.5",
+    "@remix-run/serve": "^2.16.5",
+    "isbot": "^4.1.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "zustand": "^5.0.3"
+  },
+  "devDependencies": {
+    "@remix-run/dev": "^2.16.5",
+    "@types/react": "^18.2.20",
+    "@types/react-dom": "^18.2.7",
+    "@typescript-eslint/eslint-plugin": "^6.7.4",
+    "@typescript-eslint/parser": "^6.7.4",
+    "autoprefixer": "^10.4.19",
+    "eslint": "^8.38.0",
+    "eslint-import-resolver-typescript": "^3.6.1",
+    "eslint-plugin-import": "^2.28.1",
+    "eslint-plugin-jsx-a11y": "^6.7.1",
+    "eslint-plugin-react": "^7.33.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "postcss": "^8.4.38",
+    "tailwindcss": "^3.4.4",
+    "typescript": "^5.1.6",
+    "vite": "^6.0.0",
+    "vite-tsconfig-paths": "^4.2.1"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
+postcss.config.js
+
+export default {
+  plugins: {
+    tailwindcss: {},
+    autoprefixer: {},
+  },
+};
+remix.config.js
+
+/** @type {import('@remix-run/dev').AppConfig} */
+export default {
+  ignoredRouteFiles: ["**/.*"],
+  serverDependenciesToBundle: [/@syncfusion/]
+};
+remix.env.d.ts
+
+/// <reference types="@remix-run/dev" />
+/// <reference types="@remix-run/node" />
+tailwind.config.ts
+
+import type { Config } from "tailwindcss";
+
+export default {
+  content: ["./app/**/{**,.client,.server}/**/*.{js,jsx,ts,tsx}"],
+  theme: {
+    extend: {
+      fontFamily: {
+        sans: [
+          "Inter",
+          "ui-sans-serif",
+          "system-ui",
+          "sans-serif",
+          "Apple Color Emoji",
+          "Segoe UI Emoji",
+          "Segoe UI Symbol",
+          "Noto Color Emoji",
+        ],
+      },
+    },
+  },
+  plugins: [],
+} satisfies Config;
+tsconfig.json
+
+{
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    "**/.server/**/*.ts",
+    "**/.server/**/*.tsx",
+    "**/.client/**/*.ts",
+    "**/.client/**/*.tsx"
+  ],
+  "compilerOptions": {
+    "lib": ["DOM", "DOM.Iterable", "ES2022"],
+    "types": ["@remix-run/node", "vite/client"],
+    "isolatedModules": true,
+    "esModuleInterop": true,
+    "jsx": "react-jsx",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "resolveJsonModule": true,
+    "target": "ES2022",
+    "strict": true,
+    "allowJs": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "baseUrl": ".",
+    "paths": {
+      "~/*": ["./app/*"]
+    },
+
+    // Vite takes care of building everything, not tsc.
+    "noEmit": true
+  }
+}
+vite.config.ts
+
+import { vitePlugin as remix } from "@remix-run/dev";
+import { defineConfig } from "vite";
+import tsconfigPaths from "vite-tsconfig-paths";
+
+declare module "@remix-run/node" {
+  interface Future {
+    v3_singleFetch: true;
+  }
+}
+
+export default defineConfig({
+  plugins: [
+    remix({
+      future: {
+        v3_fetcherPersist: true,
+        v3_relativeSplatPath: true,
+        v3_throwAbortReason: true,
+        v3_singleFetch: true,
+        v3_lazyRouteDiscovery: true,
+      },
+    }),
+    tsconfigPaths(),	
+  ],
+  ssr: {
+	noExternal: [
+	/@syncfusion/, 
+      "@mui/material",
+      "@mui/icons-material",
+      "ra-core",
+      "ra-data-simple-rest", // Se você está usando esse provider
+      "ra-data-json-server", // Para JSON Server
+      "react-admin", // Pacote principal do React-admin
+	  "ej2-react-buttons",
+	]
+	},
+});

@@ -6,6 +6,7 @@ services:
     container_name: pythonbackend
     ports:
       - "8000:8000"
-    environment:
-      
+    environment:      
       - OPENAI_API_KEY=${OPENAI_API_KEY}
+    volumes:
+      - .:/app  # Monta o diretório atual (.) no diretório /app do container

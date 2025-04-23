@@ -10,7 +10,7 @@ export default function Layout() {
     const outputText = useCommandStore((state) => state.outputText);
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
+    <div className="min-h-screen flex flex-col bg-gray-150">
       <Header />
       <main className="flex-1 flex flex-col md:flex-row p-4 gap-4">
         <section className="w-full md:w-1/2">
