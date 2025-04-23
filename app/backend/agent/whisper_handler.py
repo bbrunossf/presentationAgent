@@ -22,10 +22,11 @@ async def transcribe_audio(file):
             tmp_path = tmp.name
 
         # Abrir o arquivo e fazer a transcrição
+        print("Agora testando o modelo whisper para transcrição")
         with open(tmp_path, "rb") as audio_file:
             transcript = client.audio.transcriptions.create(
-                model="gpt-4o-transcribe",
-                #model="whisper-1",  # Usando modelo correto do Whisper
+                #model="gpt-4o-transcribe",
+                model="whisper-1",  # Usando modelo correto do Whisper
                 file=audio_file,
                 response_format="text"
             )

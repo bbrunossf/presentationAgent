@@ -9,4 +9,4 @@ services:
     environment:      
       - OPENAI_API_KEY=${OPENAI_API_KEY}
     volumes:
-      - .:/app  # Monta o diretório atual (.) no diretório /app do container
+      - "J:/backupD/drive_Dados/streamlit apps/26_Agentes_IA/presentation_remix_project/app/backend/agent:/app"

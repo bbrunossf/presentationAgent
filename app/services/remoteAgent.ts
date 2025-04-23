@@ -6,10 +6,16 @@
 //     content: string;
 //   };
 
-type AgentResponse = {
-  message: string; // Alterado para um campo mais simples
-};
-  
+// type AgentResponse = {
+//   message: string; // Alterado para um campo mais simples
+// };
+export type AgentResponse = {
+    type: string;
+    content: string;
+    format?: string;
+    metadata?: any;
+  };
+    
   // export async function runAgent(prompt: string): Promise<AgentResponse> {
   //   console.log("Executando agente com o prompt:", prompt);
   //   try {
@@ -60,11 +66,16 @@ type AgentResponse = {
             throw new Error(`Erro do agente: ${errorText}`);
         }
 
-        const result: AgentResponse = await response.json();
-        console.log("++++++++++Resposta do agente:", result);
+        //const result: AgentResponse = await response.json();
+        // pull back the full agent response object { type, content, ... }
+        const agentResponse = await response.json() as AgentResponse;
+        //console.log("++++++++++Resposta do agente:", agentResponse);
         //return result; // Retornando resposta do agente
         //return result.content; // Retornando apenas o conteúdo
-        return { message: result.content }; // Retornando apenas a mensagem (porque ela está vindo como " { type: 'text', content: 'Olá! Como posso ajudá-lo hoje?' }")
+        
+        //return { message: result.content }; // Retornando apenas a mensagem (porque ela está vindo como " { type: 'text', content: 'Olá! Como posso ajudá-lo hoje?' }")
+        // pass it straight through
+        return agentResponse;
     } catch (error: any) {
         console.error("Erro ao enviar texto:", error.message);
         throw error; // Lançando o erro para ser tratado por quem chamou a função

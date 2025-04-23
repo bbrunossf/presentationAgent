@@ -1,17 +1,22 @@
-import {create} from 'zustand';
+import { create } from 'zustand';
+import type { AgentResponse } from '~/services/remoteAgent';
 
 interface CommandStore {
+  // last entered command text
   inputText: string;
-  outputText: string;
+  // full response from the agent, or null if none yet
+  agentResponse: AgentResponse | null;
   setInputText: (input: string) => void;
-  setOutputText: (output: string) => void;
-  setResponse: (args: { input: string; output: string }) => void;
+  /**
+   * Store both the input command and the full AgentResponse
+   */
+  setResponse: (args: { input: string; response: AgentResponse }) => void;
 }
 
 export const useCommandStore = create<CommandStore>((set) => ({
   inputText: '',
-  outputText: '',
+  agentResponse: null,
   setInputText: (input) => set({ inputText: input }),
-  setOutputText: (output) => set({ outputText: output }),
-  setResponse: ({ input, output }) => set({ inputText: input, outputText: output }),
+  setResponse: ({ input, response }) =>
+    set({ inputText: input, agentResponse: response }),
 }));

@@ -2,12 +2,12 @@
 import { useCommandStore } from "~/store/useCommandStore";
 import Header from "./Header";
 import CommandInput from "./CommandInput";
-import OutputDisplay from "./OutputDisplay";
+import { OutputDisplay } from "./OutputDisplay";
 import Canvas from "./Canvas";
 
 export default function Layout() {
     const inputText = useCommandStore((state) => state.inputText);
-    const outputText = useCommandStore((state) => state.outputText);
+    const agentResponse = useCommandStore((state) => state.agentResponse);
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-150">
@@ -25,10 +25,29 @@ export default function Layout() {
         <section className="w-full md:w-1/2">
           {/* <OutputDisplay text={transcription || "Aguardando transcrição..."} />
           <OutputDisplay text={response || "Aguardando resposta do agente..."} /> */}
-          <OutputDisplay text={inputText || "Aguardando entrada..."} />
-          <OutputDisplay text={outputText || "Aguardando resposta do agente..."} />
-          {/* Canvas for nested AI agent output routes */}
-          <Canvas />
+          {/* Display the user's input as text */}
+          <OutputDisplay
+            response={{
+              type: "text",
+              content: inputText || "Aguardando entrada...",
+            }}
+          />
+          {/* Display the agent's response: text via OutputDisplay, others via Canvas */}
+          {agentResponse ? (
+            agentResponse.type === 'text' ? (
+              <OutputDisplay response={agentResponse} />
+            ) : (
+              <Canvas response={agentResponse} />
+            )
+          ) : (
+            <OutputDisplay
+              response={{
+                type: "text",
+                content: "Aguardando resposta do agente...",
+              }}
+            />
+          )}          
+
         </section>
       </main>
     </div>

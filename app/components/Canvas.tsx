@@ -1,8 +1,6 @@
-// app/routes/canvas.tsx
-import { LoaderFunction } from '@remix-run/node';
-import { useLoaderData } from '@remix-run/react';
-import { useState, useEffect } from 'react';
-import { AgentResponse } from '~/types/AgentResponse';
+// app/components/Canvas.tsx
+import React, { useState, useEffect } from 'react';
+import type { AgentResponse } from '~/services/remoteAgent';
 
 // Componentes de renderização
 const TextRenderer: React.FC<{ content: string }> = ({ content }) => (
@@ -10,20 +8,27 @@ const TextRenderer: React.FC<{ content: string }> = ({ content }) => (
 );
 
 const ChartRenderer: React.FC<{ content: string | Buffer }> = ({ content }) => {
+  // Handle base64 string directly
+  if (typeof content === 'string') {
+    return (
+      <div className="chart-container">
+        <img
+          src={`data:image/png;base64,${content}`}
+          alt="Gráfico gerado"
+        />
+      </div>
+    );
+  }
+  // Handle binary Buffer or Uint8Array
   const [imageUrl, setImageUrl] = useState<string | null>(null);
-
   useEffect(() => {
-    // Converter buffer para URL de imagem
-    if (content instanceof Buffer || content instanceof Uint8Array) {
+    if (content instanceof Uint8Array || content instanceof Buffer) {
       const blob = new Blob([content], { type: 'image/png' });
       const url = URL.createObjectURL(blob);
       setImageUrl(url);
-
-      // Limpar URL criada quando o componente desmontar
       return () => URL.revokeObjectURL(url);
     }
   }, [content]);
-
   return (
     <div className="chart-container">
       {imageUrl && <img src={imageUrl} alt="Gráfico gerado" />}
@@ -104,81 +109,34 @@ const ErrorRenderer: React.FC<{ content: string, metadata?: any }> = ({
   </div>
 );
 
-// // Definir o tipo de retorno do loader
-// type LoaderData = {
-//   response: AgentResponse;
-// };
-
-export const loader: LoaderFunction = async () => {
-  try {
-    // Ler arquivo JSON gerado pelo agente
-    const fs = await import('fs/promises');
-    const path = await import('path');
-    
-    const filePath = path.resolve('./agent-response.json');
-    const rawContent = await fs.readFile(filePath, 'utf-8');
-    const agentResponse: AgentResponse = JSON.parse(rawContent);
-
-    return { response: agentResponse };
-  } catch (error) {
-    return { 
-      response: {
-        type: 'error',
-        content: 'Erro ao carregar resposta do agente',
-        metadata: { 
-          errorMessage: error instanceof Error ? error.message : String(error),
-          errorStack: error instanceof Error ? error.stack : undefined
-        }
-      }      
-    };
-  }
-};
-
-export default function Canvas() {
-  //const { response } = useLoaderData<LoaderData>();
-  const response  = useLoaderData<typeof loader>();
-  console.log('Response:', response);
-  //const response  = null;
+export default function Canvas({ response }: { response: AgentResponse }) {
+  // Renders non-text agent responses (chart, pdf, database, error, etc.)
+  // For text responses, Layout should use OutputDisplay instead
 
   if (!response) {
-    return <div>Carregando...</div>;
+    return <div>Carregando resposta do agente...</div>;
   }
 
   const renderContent = () => {
     switch (response.type) {
-      case 'text':
-        return <TextRenderer content={response.content as string} />;
-      
       case 'chart':
-        return <ChartRenderer content={response.content} />;
-      
+        // content expected as base64 or Buffer
+        return <ChartRenderer content={response.content as any} />;
       case 'pdf':
-        return <PDFRenderer content={response.content as Buffer} />;
-      
+        return <PDFRenderer content={response.content as any} />;
       case 'database':
         return <DatabaseResultRenderer content={response.content as any[]} />;
-      
       case 'error':
-        return <ErrorRenderer 
-          content={response.content as string} 
-          metadata={response.metadata}
-        />;
-      
+        return <ErrorRenderer content={response.content as string} metadata={response.metadata} />;
       default:
-        return <div>Tipo de resposta não suportado</div>;
+        return <div>Tipo de resposta não suportado: {String(response.type)}</div>;
     }
   };
 
   return (
-    <div className="canvas-container">
-      <div className="canvas-header">
-        {response.metadata?.title && (
-          <h2>{response.metadata.title}</h2>
-        )}
-        {response.metadata?.description && (
-          <p>{response.metadata.description}</p>
-        )}
-      </div>
+    <div className="canvas-container w-full p-4 bg-white shadow-md rounded-lg">      
+        {response.metadata?.title && <h2>{response.metadata.title}</h2>}
+        {response.metadata?.description && <p>{response.metadata.description}</p>}
       {renderContent()}
     </div>
   );

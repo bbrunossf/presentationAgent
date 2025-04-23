@@ -2,6 +2,7 @@
 import { useState } from "react";
 import VoiceInput from "./VoiceInput";
 import { useCommandStore } from "~/store/useCommandStore";
+import type { AgentResponse } from "~/services/remoteAgent";
 
 export default function CommandInput() {
   const setResponse = useCommandStore((state) => state.setResponse);
@@ -20,15 +21,24 @@ export default function CommandInput() {
       if (!res.ok) {
         const msg = await res.text();
         console.error("Erro na resposta do agente:", msg);
-        setResponse({ input: command, output: `Erro: ${msg}` });
+        // store an error response
+        setResponse({
+          input: command,
+          response: { type: "error", content: `Erro: ${msg}` },
+        });
         return;
       }
-  
-      const {  content } = await res.json();
-      setResponse({ input: command, output:  content });
+
+      // full AgentResponse including type, content, metadata, etc.
+      const data: AgentResponse = await res.json();
+      setResponse({ input: command, response: data });
     } catch (err: any) {
       console.error("Erro na requisição ao agente:", err);
-      setResponse({ input: command, output: "Erro ao conectar com o agente." });
+      // store an error response
+      setResponse({
+        input: command,
+        response: { type: "error", content: "Erro ao conectar com o agente." },
+      });
     }
   };
   

@@ -11,11 +11,13 @@ export const action: ActionFunction = async ({ request }) => {
   //const result = await runAgent(prompt);
 
   // Send the prompt to the remote agent and get its message
-  const { message } = await sendTextToAgent(prompt);
-  console.log("Mensagem recebida do agente:", message);
+  //const { message } = await sendTextToAgent(prompt);
+  const agentResponse = await sendTextToAgent(prompt);
+  //console.log("Mensagem recebida do agente:", agentResponse);
   
   // Return field 'content' so the frontend can destructure { content }
-  return json({ content: message });
+  //return json({ content: message });
+  return json(agentResponse);
 };
 
 //create a dummy loader function
