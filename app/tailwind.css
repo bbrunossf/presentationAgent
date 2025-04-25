@@ -10,3 +10,40 @@ body {
     color-scheme: dark;
   }
 }
+
+/* Estilos do PDF Viewer */
+.pdf-viewer-container {
+  @apply bg-white rounded-lg p-4 shadow-md;
+}
+
+.pdf-page {
+  @apply border border-gray-200 mx-auto;
+}
+
+.pdf-controls {
+  @apply flex items-center justify-center gap-4 mt-4;
+}
+
+.pdf-button {
+  @apply px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 
+         disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors;
+}
+
+.pdf-page-count {
+  @apply text-gray-600 font-medium;
+}
+
+/* Ajustes para dark mode */
+@media (prefers-color-scheme: dark) {
+  .pdf-viewer-container {
+    @apply bg-gray-800;
+  }
+  
+  .pdf-page {
+    @apply border-gray-600;
+  }
+  
+  .pdf-page-count {
+    @apply text-gray-300;
+  }
+}

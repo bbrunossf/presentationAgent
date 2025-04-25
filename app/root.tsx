@@ -32,9 +32,9 @@ export default function App() {
       </head>
       <body className="min-h-screen font-sans">
         <header className="p-4 bg-gray-800 border-b border-gray-700">
-          <h1 className="text-2xl font-bold text-white">Agente de IA Interativo 🎤</h1>
+          <h1 className="text-2xl font-bold text-white">Agente de IA Interativo</h1>
         </header>
-        <main className="p-4 max-w-4xl mx-auto">
+        <main className="p-4 w-full mx-auto">
           <Outlet />
         </main>
         <ScrollRestoration />

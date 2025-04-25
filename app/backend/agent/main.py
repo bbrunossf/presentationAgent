@@ -31,6 +31,7 @@ async def process_command(request: Request):
         raise HTTPException(status_code=400, detail="Missing or invalid 'command' field")
     # Delegate to agent with the raw command string
     result = agent.process_request(command)
+    #print(f"o resultado do pdf é: {type(result)}")
     return result
 
 @app.post("/agent/openai")

@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-
+import type { AgentResponse } from "~/services/remoteAgent";
 import { useCommandStore } from "~/store/useCommandStore";
 
 export default function VoiceInput() {
@@ -35,14 +35,23 @@ export default function VoiceInput() {
         });
         const { text } = await transcribeRes.json();
         console.log("Transcrição:", text);
-
+        
         const agentRes = await fetch("/api/run-agent", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ prompt: text }),
         });
-        const { content } = await agentRes.json();
-        setResponse({ input: text, output: content });
+        if (!agentRes.ok) {
+          const msg = await agentRes.text();
+          console.error("Erro na resposta do agente:", msg);
+          setResponse({
+            input: text,
+            response: { type: "error", content: `Erro: ${msg}` },
+          });
+        } else {
+          const data: AgentResponse = await agentRes.json();
+          setResponse({ input: text, response: data }); // Alinhado com CommandInput
+        }
         //onResponse({ input: text, output: "(agent ainda não implementado)" });
       } catch (err) {
         console.error("Erro durante transcrição ou resposta:", err);

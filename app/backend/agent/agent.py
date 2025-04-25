@@ -19,7 +19,8 @@ class AIAgent:
             "listar projetos": self.handle_project_listing,
             "gráfico de vendas": self.tools.generate_sales_chart,
             "gerar gráfico": self.tools.generate_sales_chart,
-            "vendas": self.tools.generate_sales_chart
+            "vendas": self.tools.generate_sales_chart,
+            "relatório completo": self.handle_full_report,
         }
         
         # Verificar se algum dos comandos diretos está na solicitação
@@ -136,3 +137,12 @@ class AIAgent:
                 "type": "text",
                 "content": message.content
             }
+            
+    def handle_full_report(self):
+        """Gera relatório PDF completo"""
+        chart_response = self.tools.generate_sales_chart()
+        if chart_response["type"] == "error":
+            return chart_response
+        
+        pdf_response = self.tools.generate_sales_pdf_report(chart_response["content"])
+        return pdf_response

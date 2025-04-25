@@ -1,6 +1,11 @@
 // app/components/Canvas.tsx
 import React, { useState, useEffect } from 'react';
 import type { AgentResponse } from '~/services/remoteAgent';
+import { Document, Page, pdfjs } from 'react-pdf';
+import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
+
+// Configurar worker
+pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
 // Componentes de renderização
 const TextRenderer: React.FC<{ content: string }> = ({ content }) => (
@@ -36,32 +41,92 @@ const ChartRenderer: React.FC<{ content: string | Buffer }> = ({ content }) => {
   );
 };
 
-const PDFRenderer: React.FC<{ content: Buffer }> = ({ content }) => {
-  const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+// const PDFRenderer: React.FC<{ content: Buffer }> = ({ content }) => {
+//   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
 
-  useEffect(() => {
-    // Converter buffer para URL de PDF
-    const blob = new Blob([content], { type: 'application/pdf' });
-    const url = URL.createObjectURL(blob);
-    setPdfUrl(url);
+//   useEffect(() => {
+//     // Converter buffer para URL de PDF
+//     const blob = new Blob([content], { type: 'application/pdf' });
+//     const url = URL.createObjectURL(blob);
+//     setPdfUrl(url);
 
-    // Limpar URL criada quando o componente desmontar
-    return () => URL.revokeObjectURL(url);
-  }, [content]);
+//     // Limpar URL criada quando o componente desmontar
+//     return () => URL.revokeObjectURL(url);
+//   }, [content]);
+
+//   return (
+//     <div className="pdf-container">
+//       {pdfUrl ? (
+//         <iframe 
+//           src={pdfUrl} 
+//           width="100%" 
+//           height="600px" 
+//           title="PDF Gerado"
+//         />
+//       ) : (
+//         <p>Carregando PDF...</p>
+//       )}
+//     </div>
+//   );
+// };
+
+// const PDFRenderer: React.FC<{ content: string }> = ({ content }) => {
+//   const [numPages, setNumPages] = useState<number | null>(null);
+//   const [pageNumber, setPageNumber] = useState(1);
+//   const pdfUrl = `data:application/pdf;base64,${content}`;
+
+//   return (
+//     <div className="pdf-viewer-container">
+//       <Document
+//         file={pdfUrl}
+//         onLoadSuccess={({ numPages }) => setNumPages(numPages)}
+//       >
+//         <Page 
+//           pageNumber={pageNumber} 
+//           width={600}
+//           renderTextLayer={false}
+//           className="pdf-page shadow-lg"
+//         />
+//       </Document>
+      
+//       <div className="pdf-controls mt-4">
+//         <button
+//           onClick={() => setPageNumber(p => Math.max(1, p - 1))}
+//           disabled={pageNumber <= 1}
+//           className="pdf-button"
+//         >
+//           Anterior
+//         </button>
+        
+//         <span className="pdf-page-count">
+//           Página {pageNumber} de {numPages || '--'}
+//         </span>
+
+//         <button
+//           onClick={() => setPageNumber(p => Math.min(p + 1, numPages || 1))}
+//           disabled={pageNumber >= (numPages || 1)}
+//           className="pdf-button"
+//         >
+//           Próxima
+//         </button>
+//       </div>
+//     </div>
+//   );
+// };
+
+const PDFRenderer: React.FC<{ content: string }> = ({ content }) => {
+  const pdfUrl = `data:application/pdf;base64,${content}`; // Constrói a URL do PDF
 
   return (
-    <div className="pdf-container">
-      {pdfUrl ? (
-        <iframe 
-          src={pdfUrl} 
-          width="100%" 
-          height="600px" 
-          title="PDF Gerado"
-        />
-      ) : (
-        <p>Carregando PDF...</p>
-      )}
-    </div>
+      <div className="pdf-viewer-container">
+          <iframe 
+              src={pdfUrl} 
+              width="100%" 
+              height="600px" 
+              title="PDF Gerado"
+              style={{ border: 'none' }} 
+          />
+      </div>
   );
 };
 
@@ -123,7 +188,8 @@ export default function Canvas({ response }: { response: AgentResponse }) {
         // content expected as base64 or Buffer
         return <ChartRenderer content={response.content as any} />;
       case 'pdf':
-        return <PDFRenderer content={response.content as any} />;
+        //return <PDFRenderer content={response.content as any} />;
+        return <PDFRenderer content={response.content as string} />;
       case 'database':
         return <DatabaseResultRenderer content={response.content as any[]} />;
       case 'error':
@@ -134,7 +200,7 @@ export default function Canvas({ response }: { response: AgentResponse }) {
   };
 
   return (
-    <div className="canvas-container w-full p-4 bg-white shadow-md rounded-lg">      
+    <div className="canvas-container w-full h-full p-4 bg-white shadow-md rounded-lg">      
         {response.metadata?.title && <h2>{response.metadata.title}</h2>}
         {response.metadata?.description && <p>{response.metadata.description}</p>}
       {renderContent()}

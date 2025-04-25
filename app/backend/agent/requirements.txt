@@ -6,3 +6,5 @@ typing
 matplotlib 
 pandas
 pydantic
+reportlab
+PyPDF2
