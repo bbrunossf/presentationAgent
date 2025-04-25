@@ -34,7 +34,8 @@ export default function Layout() {
           />
           {/* Display the agent's response: text via OutputDisplay, others via Canvas */}
           {agentResponse ? (
-            agentResponse.type === 'text' ? (
+            //agentResponse.type === 'text' ? (
+            (agentResponse.type === 'text' || agentResponse.type === 'intermediate') ? (
               <OutputDisplay response={agentResponse} />
             ) : (
               <Canvas response={agentResponse} />

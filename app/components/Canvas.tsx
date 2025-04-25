@@ -1,6 +1,6 @@
 // app/components/Canvas.tsx
 import React, { useState, useEffect } from 'react';
-import type { AgentResponse } from '~/services/remoteAgent';
+import type { AgentResponse, FullAgentResponse } from '~/services/remoteAgent';
 import { Document, Page, pdfjs } from 'react-pdf';
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 
@@ -178,11 +178,23 @@ export default function Canvas({ response }: { response: AgentResponse }) {
   // Renders non-text agent responses (chart, pdf, database, error, etc.)
   // For text responses, Layout should use OutputDisplay instead
 
+  console.log("antes de desestruturar:", response);
+  //deconstructuring response in 'intermediate' and 'final'
+  //const { intermediate, final } = response;
+
   if (!response) {
     return <div>Carregando resposta do agente...</div>;
   }
 
   const renderContent = () => {
+    //console.log("++++++++++++++resposta recebida:", intermediate);
+    //console.log("++++++++++++++resposta recebida:", final);
+    //deconstruct 'final' response
+    //const { type, content } = final;
+    //console.log("++++++++++++++resposta recebida:", type);
+    //console.log("++++++++++++++resposta recebida:", content);
+
+
     switch (response.type) {
       case 'chart':
         // content expected as base64 or Buffer
@@ -195,14 +207,14 @@ export default function Canvas({ response }: { response: AgentResponse }) {
       case 'error':
         return <ErrorRenderer content={response.content as string} metadata={response.metadata} />;
       default:
-        return <div>Tipo de resposta não suportado: {String(response.type)}</div>;
+        return <div>Tipo de resposta não suportado: {String(response)}</div>;
     }
   };
 
   return (
     <div className="canvas-container w-full h-full p-4 bg-white shadow-md rounded-lg">      
-        {response.metadata?.title && <h2>{response.metadata.title}</h2>}
-        {response.metadata?.description && <p>{response.metadata.description}</p>}
+        {/* {response.metadata?.title && <h2>{response.metadata?.title}</h2>}
+        {response.metadata?.description && <p>{response.metadata?.description}</p>} */}
       {renderContent()}
     </div>
   );

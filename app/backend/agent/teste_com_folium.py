@@ -46,7 +46,7 @@ def extrair_coordenadas(caminho_foto):
             lat = tags['GPS GPSLatitude']
             lon = tags['GPS GPSLongitude']
             # Converter coordenadas EXIF para graus decimais
-            print(lat.values)
+            #print(lat.values)
             lat_dec = float(lat.values[0]) + float(lat.values[1])/60 + float(lat.values[2])/3600
             lon_dec = float(lon.values[0]) + float(lon.values[1])/60 + float(lon.values[2])/3600
             return -lat_dec, -lon_dec
@@ -93,6 +93,15 @@ df = pd.DataFrame(dados_fotos)
 
 df
 
+# import pprint
+# pprint.pprint(df['caminho'][0])
+# #print(df['caminho'])
+
+from folium.plugins import MarkerCluster
+import base64
+from PIL import Image
+import io
+
 # Criar mapa base (centrado na média das coordenadas)
 mapa = folium.Map(
     location=[df['lat'].mean(), df['lon'].mean()],
@@ -100,21 +109,52 @@ mapa = folium.Map(
     tiles="cartodbpositron"
 )
 
+marker_cluster = MarkerCluster().add_to(mapa)
+#/content/sample_data/fotos_obra/2e94ce4a-9d86-4cd1-916f-30c6ce10d1a5.jpg
+
 # Adicionar marcadores coloridos por obra
 for idx, row in df.iterrows():
     cor = CORES_OBRAS.get(row['obra'], 'gray')
+    #caminho = row['caminho']
+    #print(caminho)
+
+    #html=f"""<img src="/content/sample_data/fotos_obra/footo.jpg" alt="xxxxx">"""
+
+    # Create an IFrame with specified width and height
+    #iframe = folium.IFrame(html, width=300, height=300)
+
+    # Create a Popup with the IFrame and set max_width
+    #popup = folium.Popup(iframe, max_width=300, min_width=300)
+
+#     popup = folium.Popup(f"""
+#     <b>Obra:</b> {row['obra']}<br>
+#     <b>Hora:</b> {row['hora']}<br>
+#     <img src="/content/sample_data/fotos_obra/2e94ce4a-9d86-4cd1-916f-30c6ce10d1a5.jpg" width="550">
+# """, max_width=550)
+
+    # Redimensiona a imagem com Pillow
+    img = Image.open(row['caminho'])
+    img.thumbnail((150, 150))  # Redimensiona para 150x150 pixels
+
+    # Salva a imagem redimensionada em um buffer de memória
+    buffered = io.BytesIO()
+    img.save(buffered, format="JPEG")
+    img_str = base64.b64encode(buffered.getvalue()).decode()
+
     popup = folium.Popup(f"""
         <b>Obra:</b> {row['obra']}<br>
         <b>Hora:</b> {row['hora']}<br>
-        <img src="{row['caminho']}" width="200px">
+        <img src="data:image/jpeg;base64,{img_str}" width="150">
     """, max_width=250)
+
+
 
     folium.Marker(
         location=[row['lat'], row['lon']],
         popup=popup,
         icon=folium.Icon(color=cor, icon="info-sign"),
         tooltip=f"{row['obra']} - {row['hora']}"
-    ).add_to(mapa)
+    ).add_to(marker_cluster)
 
 # Adicionar linha do tempo animada (TimestampedGeoJson)
 features = []

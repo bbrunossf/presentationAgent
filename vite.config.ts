@@ -31,6 +31,7 @@ export default defineConfig({
       "ra-data-json-server", // Para JSON Server
       "react-admin", // Pacote principal do React-admin
 	  "ej2-react-buttons",
+    "react-syntax-highlighter",
 	]
 	},
 });

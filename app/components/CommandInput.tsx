@@ -28,19 +28,55 @@ export default function CommandInput() {
         });
         return;
       }
-
-      // full AgentResponse including type, content, metadata, etc.
-      const data: AgentResponse = await res.json();
-      setResponse({ input: command, response: data });
-    } catch (err: any) {
-      console.error("Erro na requisição ao agente:", err);
-      // store an error response
+      
+      const data = await res.json();
+      console.log("Resposta do agente, antes de extrair:", data);
+      // setResponse({ input: command, response: data.intermediate });
+      // setTimeout(() => {
+      //   setResponse({ input: command, response: data.final });
+      // }, 300); // ou sem timeout se quiser resposta imediata
+      
+      // Verifica se a resposta tem o formato com intermediate/final ou é uma resposta direta
+    if (data.intermediate && data.final) {
+      // Formato com intermediate/final
+      setResponse({ 
+        input: command, 
+        response: data.intermediate 
+      });
+      
+      setTimeout(() => {
+        setResponse({ 
+          input: command, 
+          response: data.final 
+        });
+      }, 300);
+    } else if (data.type) {
+      // Formato direto (pdf, chart, etc.)
+      console.log("Resposta do agente:", data.type, data.metadata);
       setResponse({
         input: command,
-        response: { type: "error", content: "Erro ao conectar com o agente." },
+        response: data,
+      });
+    } else {
+      // Formato desconhecido
+      console.error("Formato de resposta desconhecido:", data);
+      setResponse({
+        input: command,
+        response: { 
+          type: "error", 
+          content: "Resposta do agente em formato não reconhecido." 
+        },
       });
     }
-  };
+    
+  } catch (err: any) {
+    console.error("Erro na requisição ao agente:", err);
+    setResponse({
+      input: command,
+      response: { type: "error", content: "Erro ao conectar com o agente." },
+    });
+  }
+};
   
 
   return (

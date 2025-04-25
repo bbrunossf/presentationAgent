@@ -30,22 +30,10 @@ async def process_command(request: Request):
     if not isinstance(command, str):
         raise HTTPException(status_code=400, detail="Missing or invalid 'command' field")
     # Delegate to agent with the raw command string
-    result = agent.process_request(command)
+    result = await agent.process_request(command)
     #print(f"o resultado do pdf é: {type(result)}")
     return result
 
-@app.post("/agent/openai")
-async def process_openai(input: OpenAIPrompt):
-    """Endpoint para processar prompts diretos via OpenAI"""
-    response = client.chat.completions.create(
-        model="gpt-4o",
-        messages=[{"role": "user", "content": input.prompt}]
-    )
-    return {
-        "type": "text",
-        "prompt": input.prompt,
-        "response": response.choices[0].message.content
-    }
     
 
 @app.post("/transcribe")

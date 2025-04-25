@@ -8,3 +8,5 @@ pandas
 pydantic
 reportlab
 PyPDF2
+openai-agents
+asyncio

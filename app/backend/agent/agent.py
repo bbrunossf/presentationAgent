@@ -1,15 +1,44 @@
 # agent.py
+from agents import Agent, ModelSettings, function_tool, Runner
 from tools import AgentTools
-from openai import OpenAI
+#from openai import OpenAI
 import os
 import json
+import asyncio
+
+tools = AgentTools()  # Instância do seu conjunto de ferramentas
+
 
 class AIAgent:
     def __init__(self):
         self.tools = AgentTools()
-        self.client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
+        #self.client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
+
+         # Wrappers das funções para o agente poder usá-las
+        @function_tool
+        def query_database(sql_query: str) -> str:
+            """Consulta o banco de dados SQLite com uma query SQL."""
+            result = self.tools.query_sqlite(sql_query)
+            return json.dumps(result)
+
+        @function_tool
+        def generate_sales_chart() -> str:
+            """Gera um gráfico de vendas mensais."""
+            result = self.tools.generate_sales_chart()
+            return json.dumps(result)
+
+        # Instancia o agente com modelo, ferramentas e instruções
+        self.agent = Agent(
+            name="Assistant",
+            instructions=(
+                "Você é um assistente de análise de dados e relatórios. "
+                "Use ferramentas sempre que for útil para responder perguntas ou gerar relatórios."
+            ),
+            model="gpt-4o",
+            tools=[query_database, generate_sales_chart],
+        )
         
-    def process_request(self, request):
+    async def process_request(self, request):
         """Processa uma solicitação e determina a resposta apropriada"""
         #print (request)
         print (request)
@@ -29,114 +58,70 @@ class AIAgent:
                 return handler()
         
         # Se não for um comando direto, use a API OpenAI para interpretar a solicitação
-        return self.interpret_with_openai(request)
+        return await self.interpret_with_openai(request)
 
     def handle_project_listing(self):
         """Lista todos os projetos do banco de dados"""
-        # Consulta ao banco de dados para listar projetos
         projects = self.tools.query_sqlite("SELECT * FROM projects")
         response = {
             "type": "database",
             "content": projects,
             "metadata": {"query": "Listar todos os projetos"}
         }
-        # Salva a resposta em JSON
         self.tools.save_agent_response(response)
         return response
         
-    def interpret_with_openai(self, user_input):
-        """Usa a API OpenAI para interpretar e responder à solicitação"""
-        # Definir as ferramentas disponíveis para a API
-        tools = [
-            {
-                "type": "function",
-                "function": {
-                    "name": "query_database",
-                    "description": "Consulta o banco de dados para obter informações",
-                    "parameters": {
-                        "type": "object",
-                        "properties": {
-                            "sql_query": {
-                                "type": "string",
-                                "description": "Consulta SQL a ser executada"
-                            }
-                        },
-                        "required": ["sql_query"]
-                    }
-                }
-            },
-            {
-                "type": "function",
-                "function": {
-                    "name": "generate_sales_chart",
-                    "description": "Gera um gráfico de vendas mensais",
-                    "parameters": {
-                        "type": "object",
-                        "properties": {}
-                    }
-                }
-            }
-        ]
-        
-        # Primeira chamada para determinar se precisamos de uma ferramenta
-        messages = [{"role": "user", "content": user_input}]
-        response = self.client.chat.completions.create(
-            model="gpt-4o",
-            messages=messages,
-            tools=tools,
-            tool_choice="auto"
-        )
-        
-        message = response.choices[0].message
-        print(message)
-        #ChatCompletionMessage(content='Olá! Como posso ajudar você hoje?', refusal=None, role='assistant', annotations=[], audio=None, function_call=None, tool_calls=None)
-        
-        # Verificar se o modelo quer usar uma ferramenta
-        if message.tool_calls:
-            # Executar a ferramenta solicitada
-            tool_call = message.tool_calls[0]
-            function_name = tool_call.function.name
-            function_args = json.loads(tool_call.function.arguments)
-            
-            tool_result = None
-            if function_name == "query_database":
-                tool_result = self.tools.query_sqlite(function_args["sql_query"])
-            elif function_name == "generate_sales_chart":
-                return self.tools.generate_sales_chart()
-            
-            # Adicionar o resultado da ferramenta à conversa
-            messages.append(message)
-            messages.append({
-                "tool_call_id": tool_call.id,
-                "role": "tool",
-                "name": function_name,
-                "content": json.dumps(tool_result)
-            })
-            
-            # Obter resposta final com o resultado da ferramenta
-            final_response = self.client.chat.completions.create(
-                model="gpt-4o",
-                messages=messages
-            )
-            
-            result = {
-                "type": "tool_assisted",
-                "tool": function_name,
-                "content": final_response.choices[0].message.content,
-                "raw_data": tool_result
-            }
-            
-            # Salvar em JSON se estiver usando ferramentas
-            self.tools.save_agent_response(result)
-            
-            return result
-        else:
-            # Se não precisar de ferramenta, retornar resposta direta
-            print(f"a resposta não formatada foi {message.content}")
-            return {
+    # def interpret_with_openai(self, user_input: str):
+    #     """Interpreta a solicitação com o agente usando o novo SDK."""
+    #     response = self.agent.run(user_input)
+
+    #     if isinstance(response, str):
+    #         return {
+    #             "type": "text",
+    #             "content": response
+    #         }
+    #     elif isinstance(response, dict):
+    #         response["type"] = "tool_assisted"
+    #         self.tools.save_agent_response(response)
+    #         return response
+
+    #versão da função com duas respostas, uma intermediária e outra final
+    async def interpret_with_openai(self, user_input: str):
+        """
+        Retorna uma resposta intermediária imediata e a resposta final após processar a solicitação.
+        Ideal para frontend consumir de forma sequencial.
+        """
+        # Etapa 1: resposta rápida para o usuário
+        intermediate = {
+            "type": "text",
+            "content": "Entendi! Estou analisando isso agora..."
+        }
+
+        # Etapa 2: executa o agente normalmente
+        #final_raw = self.agent.run(user_input)
+        final_raw = await Runner.run(self.agent, input=user_input)
+
+        if isinstance(final_raw, str):
+            final = {
                 "type": "text",
-                "content": message.content
+                "content": final_raw.final_output
             }
+        else:
+            #final = final_raw.final_output
+            #final["type"] = "tool_assisted"
+            final = {
+                "type": "text",
+                "content": final_raw.final_output
+            }
+
+        # Opcional: salvar ambas as respostas
+        self.tools.save_agent_response(intermediate)
+        self.tools.save_agent_response(final)
+
+        return {
+            "intermediate": intermediate,
+            "final": final
+        }
             
     def handle_full_report(self):
         """Gera relatório PDF completo"""

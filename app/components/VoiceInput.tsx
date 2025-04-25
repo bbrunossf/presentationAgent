@@ -49,8 +49,13 @@ export default function VoiceInput() {
             response: { type: "error", content: `Erro: ${msg}` },
           });
         } else {
-          const data: AgentResponse = await agentRes.json();
-          setResponse({ input: text, response: data }); // Alinhado com CommandInput
+          // const data: AgentResponse = await agentRes.json();
+          // setResponse({ input: text, response: data }); // Alinhado com CommandInput
+          const data = await agentRes.json();
+          setResponse({ input: text, response: data.intermediate });
+          setTimeout(() => {
+            setResponse({ input: text, response: data.final });
+          }, 300);
         }
         //onResponse({ input: text, output: "(agent ainda não implementado)" });
       } catch (err) {
