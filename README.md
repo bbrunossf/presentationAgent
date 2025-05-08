@@ -28,24 +28,24 @@ O projeto vai utilizar o framework Remix, e todas as bibliotecas usadas serão r
 
 ## Estrutura inicial do Projeto
 Relação de pastas e arquivos necessários
-/app
-├── /routes
-│   ├── index.tsx            # Rota principal que renderiza a interface geral
-│   ├── /generated           # Pasta para armazenar as rotas geradas dinamicamente
-│   │   └── newRoute.tsx     # Exemplo de uma rota gerada dinamicamente
-├── /components
-│   ├── Layout.tsx           # Layout principal da aplicação
-│   ├── Sidebar.tsx          # Componente para a navegação lateral
-│   ├── WorkloadChart.tsx    # Componente para renderizar o gráfico de carga de trabalho
-├── /utils
-│   ├── generateRoute.ts     # Função para gerar código de novas rotas
-│   └── writeRouteToFile.ts  # Função para escrever o código gerado no arquivo da rota
-├── /services
-│   └── agent.ts             # Agente de IA que gera o código das rotas
-├── /styles
-│   └── global.css           # Estilos globais
-├── /data
-│   └── routes.json          # Arquivo JSON que mantém o histórico das rotas geradas
-└── /config
-    └── remix.config.js      # Arquivo de configuração do Remix
+/app  
+├── /routes  
+│   ├── index.tsx            # Rota principal que renderiza a interface geral  
+│   ├── /generated           # Pasta para armazenar as rotas geradas dinamicamente  
+│   │   └── newRoute.tsx     # Exemplo de uma rota gerada dinamicamente  
+├── /components  
+│   ├── Layout.tsx           # Layout principal da aplicação  
+│   ├── Sidebar.tsx          # Componente para a navegação lateral  
+│   ├── WorkloadChart.tsx    # Componente para renderizar o gráfico de carga de trabalho  
+├── /utils  
+│   ├── generateRoute.ts     # Função para gerar código de novas rotas  
+│   └── writeRouteToFile.ts  # Função para escrever o código gerado no arquivo da rota  
+├── /services  
+│   └── agent.ts             # Agente de IA que gera o código das rotas  
+├── /styles  
+│   └── global.css           # Estilos globais  
+├── /data  
+│   └── routes.json          # Arquivo JSON que mantém o histórico das rotas geradas  
+└── /config  
+    └── remix.config.js      # Arquivo de configuração do Remix  
 
