@@ -49,3 +49,4 @@ Relação de pastas e arquivos necessários
 └── /config  
     └── remix.config.js      # Arquivo de configuração do Remix  
 
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/bbrunossf/presentationAgent)
