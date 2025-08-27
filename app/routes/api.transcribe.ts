@@ -14,7 +14,7 @@ export const action: ActionFunction = async ({ request }) => {
 
   console.log("Arquivo recebido:", file.name, file.type, file.size);
 
-  const response = await fetch("http://localhost:8000/transcribe", {
+  const response = await fetch("http://192.168.15.7:8000/transcribe", {
     method: "POST",
     body: (() => {
       const fd = new FormData();

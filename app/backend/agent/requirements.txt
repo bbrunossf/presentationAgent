@@ -10,3 +10,4 @@ reportlab
 PyPDF2
 openai-agents
 asyncio
+pg8000

@@ -18,7 +18,7 @@ class AIAgent:
         @function_tool
         def query_database(sql_query: str) -> str:
             """Consulta o banco de dados SQLite com uma query SQL."""
-            result = self.tools.query_sqlite(sql_query)
+            result = self.tools.query_database(sql_query)
             return json.dumps(result)
 
         @function_tool
@@ -62,7 +62,7 @@ class AIAgent:
 
     def handle_project_listing(self):
         """Lista todos os projetos do banco de dados"""
-        projects = self.tools.query_sqlite("SELECT * FROM projects")
+        projects = self.tools.query_database("SELECT * FROM `Obras`")
         response = {
             "type": "database",
             "content": projects,

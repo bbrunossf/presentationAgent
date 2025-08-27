@@ -17,7 +17,7 @@ export type FullAgentResponse = {
 export async function sendTextToAgent(text: string): Promise<FullAgentResponse> {
     console.log("Enviando texto para o agente:", text);
     try {
-        const response = await fetch("http://localhost:8000/agent/process", {
+        const response = await fetch("http://192.168.15.7:8000/agent/process", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
