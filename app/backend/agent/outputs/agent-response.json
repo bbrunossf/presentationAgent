@@ -1,4 +1,0 @@
-{
-  "type": "text",
-  "content": "Claro! Aqui está um exemplo de código \"Olá Mundo\" em C++:\n\n```cpp\n#include <iostream>\n\nint main() {\n    std::cout << \"Olá Mundo\" << std::endl;\n    return 0;\n}\n```\n\nEste programa usa a biblioteca `iostream` para imprimir \"Olá Mundo\" no console."
-}
