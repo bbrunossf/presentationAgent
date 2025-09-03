@@ -17,26 +17,47 @@ class AIAgent:
 
          # Wrappers das funções para o agente poder usá-las
         @function_tool
+        def get_database_schema() -> str:
+            """Retorna o schema do banco de dados a partir de um arquivo JSON fixo. Elabore a query a partir dessas informações."""
+            print("DEBUG - ferramenta get_database_schema chamada!")
+            result = self.tools.get_database_schema()
+            print(f"++++resultado do get schema: {result} +++++")
+            return json.dumps(result, default=json_serializer)
+
+        @function_tool
         def query_database(sql_query: str) -> str:
-            """Consulta o banco de dados SQLite com uma query SQL."""
+            """Consulta o banco de dados configurado com uma query SQL."""
+            print("DEBUG - ferramenta query_database chamada!")
             result = self.tools.query_database(sql_query)
+            print(f"====={result}=====")
             return json.dumps(result, default=json_serializer)
 
         @function_tool
         def generate_sales_chart() -> str:
             """Gera um gráfico de vendas mensais."""
+            print("DEBUG - ferramenta generate_sales_chart chamada!")
             result = self.tools.generate_sales_chart()
             return json.dumps(result, default=json_serializer)
+        
+        def log_event(event):
+            print("=== EVENTO DO AGENTE ===")
+            print(event)
 
         # Instancia o agente com modelo, ferramentas e instruções
         self.agent = Agent(
             name="Assistant",
             instructions=(
                 "Você é um assistente de análise de dados e relatórios. "
-                "Use ferramentas sempre que for útil para responder perguntas ou gerar relatórios."
+                "Use ferramentas sempre que for útil para responder perguntas ou gerar relatórios."                
+                "O banco de dados usado é PostgreSQL. "
+                "Nunca use tabelas ou comandos específicos do SQLite (como sqlite_master). "
+                "Sempre que precisar conhecer a estrutura do banco, pergunte ao usuário qual a tabela a ser pesquisada, e depois, execute a query apropriada com a ferramenta query_database."
+                "Todas as queries devem usar tabelas existentes no schema 'dev'."
+                "Todas as queries SQL devem usar explicitamente o schema dev (ex: dev.tabela)."
             ),
             model="gpt-4o",
             tools=[query_database, generate_sales_chart],
+            #on_event=log_event #só no agent-sdk
         )
         
     async def process_request(self, request):
@@ -68,7 +89,7 @@ class AIAgent:
 
     def handle_project_listing(self):
         """Lista todos os projetos do banco de dados"""
-        projects = self.tools.query_database('SELECT * FROM "Obra"')
+        projects = self.tools.query_database('SELECT * FROM dev."Obra"')
         response = {
             "type": "database",
             "content": projects,
@@ -106,6 +127,7 @@ class AIAgent:
         # Etapa 2: executa o agente normalmente
         #final_raw = self.agent.run(user_input)
         final_raw = await Runner.run(self.agent, input=user_input)
+        
 
         if isinstance(final_raw, str):
             final = {

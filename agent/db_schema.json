@@ -1,0 +1,582 @@
+[
+	{
+		"table": "Pessoa",
+		"column": "funcao",
+		"type": "text"
+	},
+	{
+		"table": "dadosCategoricos",
+		"column": "escada",
+		"type": "boolean"
+	},
+	{
+		"table": "Agenda",
+		"column": "criadoEm",
+		"type": "timestamp without time zone"
+	},
+	{
+		"table": "Categoria",
+		"column": "nome_categoria",
+		"type": "text"
+	},
+	{
+		"table": "TaskResourceAssignment",
+		"column": "taskId",
+		"type": "integer"
+	},
+	{
+		"table": "Registro",
+		"column": "duracao_minutos",
+		"type": "integer"
+	},
+	{
+		"table": "Registro",
+		"column": "id_nome",
+		"type": "integer"
+	},
+	{
+		"table": "_prisma_migrations",
+		"column": "logs",
+		"type": "text"
+	},
+	{
+		"table": "obra_embeddings",
+		"column": "criado_em",
+		"type": "timestamp with time zone"
+	},
+	{
+		"table": "TipoTarefa",
+		"column": "nome_tipo",
+		"type": "text"
+	},
+	{
+		"table": "Pessoa",
+		"column": "ativo",
+		"type": "boolean"
+	},
+	{
+		"table": "Obra",
+		"column": "cod_obra",
+		"type": "text"
+	},
+	{
+		"table": "ElementoEstrutural",
+		"column": "quantidade",
+		"type": "integer"
+	},
+	{
+		"table": "ResumoObra",
+		"column": "arquivoId",
+		"type": "text"
+	},
+	{
+		"table": "Task",
+		"column": "order",
+		"type": "integer"
+	},
+	{
+		"table": "Registro",
+		"column": "id_registro",
+		"type": "integer"
+	},
+	{
+		"table": "Task",
+		"column": "predecessor",
+		"type": "text"
+	},
+	{
+		"table": "Pessoa",
+		"column": "email",
+		"type": "text"
+	},
+	{
+		"table": "Obra",
+		"column": "tipo_obra",
+		"type": "text"
+	},
+	{
+		"table": "Pessoa",
+		"column": "id_nome",
+		"type": "integer"
+	},
+	{
+		"table": "Agenda",
+		"column": "dia_inteiro",
+		"type": "boolean"
+	},
+	{
+		"table": "dadosCategoricos",
+		"column": "fundacao",
+		"type": "boolean"
+	},
+	{
+		"table": "CustoHora",
+		"column": "fimVigencia",
+		"type": "timestamp without time zone"
+	},
+	{
+		"table": "Task",
+		"column": "isPaused",
+		"type": "boolean"
+	},
+	{
+		"table": "Obra",
+		"column": "finalizada",
+		"type": "boolean"
+	},
+	{
+		"table": "Registro",
+		"column": "id_obra",
+		"type": "integer"
+	},
+	{
+		"table": "Obra",
+		"column": "data_inicio",
+		"type": "timestamp without time zone"
+	},
+	{
+		"table": "ResumoObra",
+		"column": "nomeObra",
+		"type": "text"
+	},
+	{
+		"table": "CustoHora",
+		"column": "custoHoraExtra",
+		"type": "double precision"
+	},
+	{
+		"table": "Agenda",
+		"column": "data_hora_inicio",
+		"type": "timestamp without time zone"
+	},
+	{
+		"table": "dadosCategoricos",
+		"column": "ponteRolante",
+		"type": "boolean"
+	},
+	{
+		"table": "Task",
+		"column": "startDate",
+		"type": "timestamp without time zone"
+	},
+	{
+		"table": "TaskResource",
+		"column": "resourceName",
+		"type": "text"
+	},
+	{
+		"table": "Registro",
+		"column": "id_categoria",
+		"type": "integer"
+	},
+	{
+		"table": "User",
+		"column": "password",
+		"type": "text"
+	},
+	{
+		"table": "dadosCategoricos",
+		"column": "mezanino",
+		"type": "boolean"
+	},
+	{
+		"table": "Cliente",
+		"column": "id_cliente",
+		"type": "integer"
+	},
+	{
+		"table": "Task",
+		"column": "obraid",
+		"type": "integer"
+	},
+	{
+		"table": "dadosCategoricos",
+		"column": "filename",
+		"type": "text"
+	},
+	{
+		"table": "Agenda",
+		"column": "id",
+		"type": "integer"
+	},
+	{
+		"table": "CustoHora",
+		"column": "id",
+		"type": "integer"
+	},
+	{
+		"table": "Pessoa",
+		"column": "data_criacao",
+		"type": "timestamp without time zone"
+	},
+	{
+		"table": "dadosCategoricos",
+		"column": "ligacoes",
+		"type": "text"
+	},
+	{
+		"table": "User",
+		"column": "role",
+		"type": "text"
+	},
+	{
+		"table": "dadosCategoricos",
+		"column": "id_model",
+		"type": "integer"
+	},
+	{
+		"table": "Agenda",
+		"column": "descricao",
+		"type": "text"
+	},
+	{
+		"table": "CustoHora",
+		"column": "custoHora",
+		"type": "double precision"
+	},
+	{
+		"table": "_prisma_migrations",
+		"column": "checksum",
+		"type": "character varying"
+	},
+	{
+		"table": "Registro",
+		"column": "hora_extra",
+		"type": "boolean"
+	},
+	{
+		"table": "dadosCategoricos",
+		"column": "tipo_perfis",
+		"type": "text"
+	},
+	{
+		"table": "Agenda",
+		"column": "id_obra",
+		"type": "integer"
+	},
+	{
+		"table": "obra_embeddings",
+		"column": "conteudo",
+		"type": "text"
+	},
+	{
+		"table": "Cliente",
+		"column": "contato",
+		"type": "text"
+	},
+	{
+		"table": "dadosCategoricos",
+		"column": "geometria",
+		"type": "character varying"
+	},
+	{
+		"table": "User",
+		"column": "id",
+		"type": "integer"
+	},
+	{
+		"table": "Agenda",
+		"column": "atualizadoEm",
+		"type": "timestamp without time zone"
+	},
+	{
+		"table": "ElementoEstrutural",
+		"column": "codObra",
+		"type": "text"
+	},
+	{
+		"table": "_prisma_migrations",
+		"column": "migration_name",
+		"type": "character varying"
+	},
+	{
+		"table": "dadosCategoricos",
+		"column": "marquise",
+		"type": "boolean"
+	},
+	{
+		"table": "dadosCategoricos",
+		"column": "cliente_final",
+		"type": "text"
+	},
+	{
+		"table": "dadosCategoricos",
+		"column": "estrutura_concreto",
+		"type": "text"
+	},
+	{
+		"table": "dadosCategoricos",
+		"column": "id_obra",
+		"type": "integer"
+	},
+	{
+		"table": "obra_embeddings",
+		"column": "metadata",
+		"type": "jsonb"
+	},
+	{
+		"table": "TaskResource",
+		"column": "resourceRole",
+		"type": "text"
+	},
+	{
+		"table": "User",
+		"column": "name",
+		"type": "text"
+	},
+	{
+		"table": "obra_embeddings",
+		"column": "id",
+		"type": "uuid"
+	},
+	{
+		"table": "dadosCategoricos",
+		"column": "fechamento",
+		"type": "boolean"
+	},
+	{
+		"table": "Task",
+		"column": "notes",
+		"type": "text"
+	},
+	{
+		"table": "ElementoEstrutural",
+		"column": "name",
+		"type": "text"
+	},
+	{
+		"table": "ResumoObra",
+		"column": "nomePredio",
+		"type": "text"
+	},
+	{
+		"table": "dadosCategoricos",
+		"column": "tipo_estrutura",
+		"type": "text"
+	},
+	{
+		"table": "Obra",
+		"column": "data_fim_planejamento",
+		"type": "timestamp without time zone"
+	},
+	{
+		"table": "_prisma_migrations",
+		"column": "id",
+		"type": "character varying"
+	},
+	{
+		"table": "obra_embeddings",
+		"column": "embedding",
+		"type": "USER-DEFINED"
+	},
+	{
+		"table": "Cliente",
+		"column": "nome_cliente",
+		"type": "text"
+	},
+	{
+		"table": "Obra",
+		"column": "total_horas_planejadas",
+		"type": "double precision"
+	},
+	{
+		"table": "Task",
+		"column": "endDate",
+		"type": "timestamp without time zone"
+	},
+	{
+		"table": "TaskResource",
+		"column": "id",
+		"type": "integer"
+	},
+	{
+		"table": "Agenda",
+		"column": "entregue_em",
+		"type": "timestamp without time zone"
+	},
+	{
+		"table": "Registro",
+		"column": "id_tipo_tarefa",
+		"type": "integer"
+	},
+	{
+		"table": "_prisma_migrations",
+		"column": "finished_at",
+		"type": "timestamp with time zone"
+	},
+	{
+		"table": "ElementoEstrutural",
+		"column": "id",
+		"type": "integer"
+	},
+	{
+		"table": "ResumoObra",
+		"column": "id",
+		"type": "integer"
+	},
+	{
+		"table": "_prisma_migrations",
+		"column": "started_at",
+		"type": "timestamp with time zone"
+	},
+	{
+		"table": "Agenda",
+		"column": "titulo",
+		"type": "text"
+	},
+	{
+		"table": "CustoHora",
+		"column": "pessoaId",
+		"type": "integer"
+	},
+	{
+		"table": "ResumoObra",
+		"column": "pesoTotal",
+		"type": "double precision"
+	},
+	{
+		"table": "ElementoEstrutural",
+		"column": "descricao",
+		"type": "text"
+	},
+	{
+		"table": "Agenda",
+		"column": "entregue",
+		"type": "boolean"
+	},
+	{
+		"table": "ResumoObra",
+		"column": "id_obra",
+		"type": "integer"
+	},
+	{
+		"table": "ElementoEstrutural",
+		"column": "pesoTotal",
+		"type": "double precision"
+	},
+	{
+		"table": "Task",
+		"column": "id",
+		"type": "integer"
+	},
+	{
+		"table": "Registro",
+		"column": "timestamp",
+		"type": "timestamp without time zone"
+	},
+	{
+		"table": "Obra",
+		"column": "id_obra",
+		"type": "integer"
+	},
+	{
+		"table": "_prisma_migrations",
+		"column": "applied_steps_count",
+		"type": "integer"
+	},
+	{
+		"table": "Task",
+		"column": "taskName",
+		"type": "text"
+	},
+	{
+		"table": "CustoHora",
+		"column": "inicioVigencia",
+		"type": "timestamp without time zone"
+	},
+	{
+		"table": "Obra",
+		"column": "id_cliente",
+		"type": "integer"
+	},
+	{
+		"table": "Agenda",
+		"column": "data_hora_termino",
+		"type": "timestamp without time zone"
+	},
+	{
+		"table": "dadosCategoricos",
+		"column": "tipo_servico",
+		"type": "text"
+	},
+	{
+		"table": "Pessoa",
+		"column": "nome",
+		"type": "text"
+	},
+	{
+		"table": "Obra",
+		"column": "data_inicio_planejamento",
+		"type": "timestamp without time zone"
+	},
+	{
+		"table": "dadosCategoricos",
+		"column": "condicao",
+		"type": "text"
+	},
+	{
+		"table": "Categoria",
+		"column": "id_categoria",
+		"type": "integer"
+	},
+	{
+		"table": "TaskResourceAssignment",
+		"column": "taskResourceId",
+		"type": "integer"
+	},
+	{
+		"table": "Task",
+		"column": "duration",
+		"type": "double precision"
+	},
+	{
+		"table": "Obra",
+		"column": "observacoes_planejamento",
+		"type": "text"
+	},
+	{
+		"table": "dadosCategoricos",
+		"column": "dificuldade",
+		"type": "integer"
+	},
+	{
+		"table": "Task",
+		"column": "progress",
+		"type": "double precision"
+	},
+	{
+		"table": "Task",
+		"column": "dataEntrega",
+		"type": "timestamp without time zone"
+	},
+	{
+		"table": "_prisma_migrations",
+		"column": "rolled_back_at",
+		"type": "timestamp with time zone"
+	},
+	{
+		"table": "TipoTarefa",
+		"column": "id_tipo_tarefa",
+		"type": "integer"
+	},
+	{
+		"table": "Obra",
+		"column": "nome_obra",
+		"type": "text"
+	},
+	{
+		"table": "ElementoEstrutural",
+		"column": "predio",
+		"type": "text"
+	},
+	{
+		"table": "Task",
+		"column": "parentId",
+		"type": "text"
+	},
+	{
+		"table": "dadosCategoricos",
+		"column": "platibanda",
+		"type": "boolean"
+	}
+]

@@ -38,10 +38,20 @@ class AgentTools:
     #     if isinstance(obj, (datetime.date, datetime.datetime)):
     #         return obj.isoformat()
     #     raise TypeError(f"Objeto {obj} do tipo {type(obj)} não é serializável")
+
+    def get_database_schema(self, filepath: str = "db_schema.json"):
+        """Carrega o schema do banco a partir de um arquivo JSON fixo."""
+        try:
+            with open(filepath, "r", encoding="utf-8") as f:
+                schema = json.load(f)
+            return schema
+        except Exception as e:
+            return {"error": f"Erro ao carregar schema: {str(e)}"}
+
     
     def save_agent_response(self, response, filepath: str = None):
         """Salva a resposta do agente em um arquivo JSON."""
-        print("DEBUG - self.output_dir:", self.output_dir)
+        #print("DEBUG - self.output_dir:", self.output_dir)
         #print("DEBUG - filepath recebido:", filepath)
         #print("DEBUG - os.path:", os.path)
         #print("DEBUG - type(os.path):", type(os.path))
@@ -60,7 +70,7 @@ class AgentTools:
         return filepath
 
     def query_database(self, query: str):
-        """Executa uma consulta SQL usando o banco configurado."""
+        """Executa uma consulta SQL usando o banco configurado. A ferramenta get_database_schema deve ser executada antes para obter o schema do banco"""
         try:
             return self.db.query(query)
         except Exception as e:

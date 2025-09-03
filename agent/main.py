@@ -1,3 +1,4 @@
+#teste para ver se atualiza
 from fastapi import FastAPI, UploadFile, File, Request, HTTPException
 from whisper_handler import transcribe_audio
 from openai import OpenAI
@@ -42,3 +43,10 @@ async def transcribe(file: UploadFile = File(...)):
     #return {"text": transcript}
     print("Transcrição gerada:", transcript)
     return {"text": transcript}
+
+@app.get("/schema")
+async def get_schema():
+    """Endpoint para retornar diretamente o schema do banco (JSON fixo)."""
+    schema = agent.tools.get_database_schema()
+    return schema
+

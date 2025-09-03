@@ -38,17 +38,24 @@ class PostgresDatabase(Database):
         self.conn = pg8000.connect(
             host=host, database=dbname, user=user, password=password, port=port
         )
+        cursor = self.conn.cursor()
+        #cursor.execute("SET search_path TO dev;")
+        cursor.close()
 
     def query(self, query: str) -> List[Dict[str, Any]]:
         try:
-            cursor = self.conn.cursor()
-            print("Conectado ao banco postgres!")
+            cursor = self.conn.cursor()            
+            #cursor.execute("SET search_path TO dev;")
             cursor.execute(query)
             columns = [desc[0] for desc in cursor.description]
             results = [dict(zip(columns, row)) for row in cursor.fetchall()]
             cursor.close()
             return results
         except pg8000.Error as e:
+            try:
+                self.conn.rollback()
+            except:
+                pass  # Se rollback falhar, ignora para não mascarar o erro original
             return [{"error": str(e)}]
 
     def close(self):
@@ -61,6 +68,7 @@ def get_database() -> Database:
     db_type = os.environ.get("DB_TYPE", "sqlite").lower()
 
     if db_type == "postgres":
+        print("selecionado o banco de dados postgres com a variável do .env")
         return PostgresDatabase(
             host=os.environ.get("DB_HOST", "localhost"),
             dbname=os.environ.get("DB_NAME", "plena"),
